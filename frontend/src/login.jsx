@@ -1,4 +1,42 @@
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+
 export default function Login() {
+
+  const navigate = useNavigate();
+  // State to store form data and error message
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+
+  // Function to handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Send POST request to backend
+      const response = await axios.post(
+        "http://localhost:5000/api/login",
+        formData
+      );
+      console.log("User created successfully:", response.data);
+      navigate('/home');
+      sessionStorage.setItem('userName', formData.email);
+      // Optionally, you can redirect the user to another page
+    } catch (error) {
+      console.error("Error creating user:", error);
+      setError("Failed to login. Please try again.");
+    }
+  };
+
     return (
       <>
         <section className="bg-white">
@@ -40,9 +78,7 @@ export default function Login() {
                   Eligendi nam dolorum aliquam, quibusdam aperiam voluptatum.
                 </p>
 
-                <form action="#" className="mt-8 grid grid-cols-6 gap-6">
-
-
+                <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">
                   <div className="col-span-6">
                     <label
                       htmlFor="Email"
@@ -56,7 +92,9 @@ export default function Login() {
                       type="email"
                       id="Email"
                       name="email"
-                      className="mt-1 w-full p-2 border rounded-md border-gray-600 bg-white text-sm text-gray-700 shadow-sm"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="mt-1 w-3/4 p-2 border rounded-md border-gray-600 bg-white text-sm text-gray-700 shadow-sm"
                     />
                   </div>
 
@@ -73,7 +111,9 @@ export default function Login() {
                       type="password"
                       id="Password"
                       name="password"
-                      className="mt-1 w-full p-2 border rounded-md border-gray-600 bg-white text-sm text-gray-700 shadow-sm"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="mt-1 w-3/4 p-2 border rounded-md border-gray-600 bg-white text-sm text-gray-700 shadow-sm"
                     />
                   </div>
 
@@ -84,7 +124,7 @@ export default function Login() {
 
                     <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                       Don't have an account?
-                      <a href="#" className="text-gray-700 ml-2 underline">
+                      <a href="/" className="text-gray-700 ml-2 underline">
                         Create an account
                       </a>
                       .

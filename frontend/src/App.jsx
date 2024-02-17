@@ -10,24 +10,17 @@ import Login from "./login";
 import Sidepanel from "./sidepanel";
 import Home from "./home";
 
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 function App() {
   return (
-    <>
-      {/* <div className="bg-slate-900">
-        <Hero />
-        <ListItem />
-        <div className="mt-5 px-10 pb-10 grid grid-cols-2 grid-row-1 grid-flow-col gap-4">
-          <div className="border rounded-md p-5 bg-white">
-            <BarChart />
-          </div>
-          <div className="border rounded-md p-5 bg-white">
-            <LineChart />
-          </div>
-        </div>
-      </div> */}
-
-      <Register />
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Register />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

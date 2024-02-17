@@ -3,7 +3,11 @@ const bcrypt = require("bcrypt");
 const db = require("./db");
 const app = express();
 const User = require("./model/userModel");
+const cors = require('cors');
+
 app.use(express.json());
+app.use(cors());
+
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
@@ -24,7 +28,7 @@ app.get("/api/users", async (req, res) => {
     const users = await User.find();
 
     // Send the list of users as the response
-    res.status(200).json(users);
+    res.json(users);
   } catch (error) {
     // If an error occurs, send an error response
     console.error("Error fetching users:", error);
