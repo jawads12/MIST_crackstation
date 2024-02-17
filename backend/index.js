@@ -97,3 +97,65 @@ app.post("/api/login", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+
+
+// POST endpoint for creating admin
+app.post("/api/createadmin", async (req, res) => {
+  try {
+    // Extract user data from the request body
+    const {  email, password } = req.body;
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+
+    // Create a new user using the User model
+    const newAdmin = new Admin({
+      email: email,
+      password: hashedPassword,
+    });
+
+    // Save the new user to the database
+    await newAdmin.save();
+
+    // Send the saved user object as the response
+    res.status(201).json(newAdmin);
+  } catch (error) {
+    // If an error occurs, send an error response
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+// POST endpoint for admin login
+app.post("/api/adminlogin", async (req, res) => {
+  try {
+    // Extract email and password from the request body
+    const { email, password } = req.body;
+
+    // Find the user with the provided email in the database
+    const admin = await Admin.findOne({ email: email });
+
+    // If user is not found, send a response indicating authentication failed
+    if (!admin) {
+      return res.status(401).json({ error: "Authentication failed. User not found." });
+    }
+
+    // Compare the provided password with the hashed password stored in the database
+    const isPasswordValid = await bcrypt.compare(password, admin.password);
+
+    // If passwords don't match, send a response indicating authentication failed
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Authentication failed. Incorrect password." });
+    }
+
+    // If authentication succeeds, send a success response
+    // user.password=password;
+    res.status(200).json( admin );
+  } catch (error) {
+    // If an error occurs, send an error response
+    console.error("Error during login:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
