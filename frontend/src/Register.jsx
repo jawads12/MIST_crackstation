@@ -1,4 +1,40 @@
-export default function Register() {
+import React, { useState } from 'react';
+
+const Register = () => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    passwordConfirmation: '',
+    gender: '',
+    dateOfBirth: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await post('http://localhost:5000/api/user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      if (response.ok) {
+        // Registration successful, handle accordingly
+      } else {
+        // Registration failed, handle accordingly
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   return (
     <>
       <section className="bg-white">
@@ -37,7 +73,7 @@ export default function Register() {
                 Eligendi nam dolorum aliquam, quibusdam aperiam voluptatum.
               </p>
 
-              <form action="#" className="mt-8 grid grid-cols-6 gap-6">
+              <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">
                 <div className="col-span-6 sm:col-span-3">
                   <label
                     htmlFor="FirstName"
@@ -163,7 +199,7 @@ export default function Register() {
                       <input
                         type="checkbox"
                         id="gender"
-                        name="marketing_accept"
+                        name="gender"
                         className="size-5 rounded-md border-gray-200 bg-white shadow-sm"
                       />
 
@@ -173,7 +209,7 @@ export default function Register() {
                       <input
                         type="checkbox"
                         id="gender"
-                        name="marketing_accept"
+                        name="gender"
                         className="size-5 rounded-md border-gray-200 bg-white shadow-sm"
                       />
 
@@ -201,7 +237,7 @@ export default function Register() {
 
 
                 <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                  <button className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500">
+                  <button type='submit' className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500">
                     Create an account
                   </button>
 
@@ -220,4 +256,7 @@ export default function Register() {
       </section>
     </>
   );
-}
+};
+
+export default Register;
+

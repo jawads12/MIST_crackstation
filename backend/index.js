@@ -17,6 +17,21 @@ app.get("/api", (req, res) => {
   res.send("Hello API");
 });
 
+// GET endpoint to fetch all users
+app.get("/api/users", async (req, res) => {
+  try {
+    // Fetch all users from the database
+    const users = await User.find();
+
+    // Send the list of users as the response
+    res.status(200).json(users);
+  } catch (error) {
+    // If an error occurs, send an error response
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // POST endpoint for creating users
 app.post("/api/users", async (req, res) => {
   try {
