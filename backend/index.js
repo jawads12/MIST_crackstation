@@ -5,6 +5,7 @@ const app = express();
 const User = require("./model/userModel");
 const Admin=require("./model/adminModel");
 const Review = require("./model/reviewModel");
+const News = require("./model/newsModel");
 const cors = require('cors');
 
 app.use(express.json());
@@ -204,6 +205,54 @@ app.get("/api/reviews/:email", async (req, res) => {
   } catch (error) {
     // If an error occurs, send an error response
     console.error("Error fetching reviews:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
+// POST endpoint for admin to post news
+app.post("/api/news", async (req, res) => {
+  // You might want to add authentication check here to ensure that the user is an admin
+
+  try {
+    // Extract news data from the request body
+    const { date, information } = req.body;
+
+    // Create a new news item using the News model
+    const newNews = new News({
+      date: date,
+      information: information,
+    });
+
+    // Save the new news item to the database
+    await newNews.save();
+
+    // Send the saved news item as the response
+    res.status(201).json(newNews);
+  } catch (error) {
+    // If an error occurs, send an error response
+    console.error("Error posting news:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+// GET endpoint to fetch today's news
+app.get("/api/news", async (req, res) => {
+  try {
+    // Get today's date in 'yyyy-mm-dd' format
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0];
+
+    // Find news items with today's date
+    const todaysNews = await News.find({ date: todayString });
+
+    // Send the fetched news items as the response
+    res.status(200).json(todaysNews);
+  } catch (error) {
+    // If an error occurs, send an error response
+    console.error("Error fetching today's news:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
