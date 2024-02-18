@@ -47,7 +47,7 @@ export default function ResponseImg() {
           {/* Render user data here */}
           <div>
             <h3 className="text-lg/tight font-medium text-gray-900">
-              {user.first_name} + age group is {calculateAgeGroup(user.dob)} + gender is {user.gender}
+              age group is {calculateAgeGroup(user.dob)} gender is {user.gender}
             </h3>
             <p className="mt-0.5 text-gray-700">{user.password}</p>
           </div>

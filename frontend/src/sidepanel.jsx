@@ -1,6 +1,17 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 
 export default function Sidepanel() {
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    // Retrieve user name from session storage
+    const storedUserName = sessionStorage.getItem("userName");
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
+  }, []);
+
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -8,7 +19,7 @@ export default function Sidepanel() {
     sessionStorage.clear();
 
     // Redirect to the login page (assuming it's named 'Login')
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -140,7 +151,14 @@ export default function Sidepanel() {
       </div>
       <div className="flex h-screen max-[900px]:hidden flex-1 flex-col justify-between border-e bg-white">
         <div className="px-4 py-6">
-          <ul className="mt-14 space-y-1">
+          <h1 className="text-3xl my-4 font-bold text-indigo-600">Travel Bangla AI</h1>
+          <h1 className="text-lg mt-2 font-bold text-gray-900 sm:text-xl">
+            Welcome {userName}
+          </h1>
+          <p className="mt-2.5 text-sm text-gray-500">
+            Let's make a new travel Plan! 🎉
+          </p>
+          <ul className="mt-6 space-y-1">
             <li>
               <a
                 href="#"

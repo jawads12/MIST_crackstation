@@ -7,6 +7,15 @@ export default function Home() {
   const [userName, setUserName] = useState("");
   const [userPromt, setUserPromt] = useState("");
   const [responseData, setResponseData] = useState(""); // State to store response data
+  const [loading, setLoading] = useState(false);
+  const userInfoString = `Age group is Young, gender is Male.`;
+
+  const [reviewData, setreviewData] = useState({
+    email: "",
+    date: "",
+    comment: "",
+
+  });
 
   const [formData, setFormData] = useState({
     prompt: "",
@@ -25,13 +34,29 @@ export default function Home() {
     setFormData({ ...formData, [name]: value });
   };
 
+  // Function to submit a review to the server
+  const submitReview = async (reviewData) => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/reviews", reviewData);
+      console.log("Review submitted:", response.data);
+    } catch (error) {
+      console.error("Error submitting review:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
+    const updatedFormData = {
+      ...formData,
+      prompt: userInfoString + formData.prompt,
+    };
+
+    setLoading(true); // Start loading
     e.preventDefault();
     try {
-      console.log("Form data:", formData);
+      console.log("Form data:", updatedFormData);
       const response = await axios.post(
         "http://127.0.0.1:5000/query",
-        formData
+        updatedFormData
       );
 
       const dataString = response.data;
@@ -40,7 +65,15 @@ export default function Home() {
       try {
         setResponseData(JSON.parse(jsonString));
         console.log(JSON.parse(jsonString));
-        // sessionStorage.setItem("JSONresponseai", JSON.parse(jsonString));
+        // Check if the note is 'review' and then submit the review
+        if (JSON.parse(jsonString).note === "review") {
+          // Assuming the review data is structured appropriately
+          submitReview({
+            email: userName, // or however you obtain the user's email
+            date: new Date().toISOString(),
+            comment: formData.prompt,
+          });
+        }
       } catch (error) {
         console.error("Error parsing JSON:", error);
         return;
@@ -48,6 +81,7 @@ export default function Home() {
     } catch (error) {
       console.error("Error:", error.message); // Log error message
     }
+    setLoading(false); // Stop loading
   };
 
   return (
@@ -57,39 +91,35 @@ export default function Home() {
       </div>
       <div className="rounded-lg col-span-9 relative">
         <header>
-          <div className="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+          <div className="mx-auto max-w-screen-xl px-4 sm:px-6 sm:py-12 lg:px-8">
             <div className="sm:flex sm:items-center sm:justify-between">
-              <div className="text-center sm:text-left">
+              <div className="text-center pt-14 sm:text-left">
                 <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-                  Welcome {userName}!
+                  Take your traveling experience to the next level
                 </h1>
 
                 <p className="mt-1.5 text-sm text-gray-500">
-                  Let's make a new travel Plan! 🎉
+                  Start a new travel Plan...
                 </p>
-              </div>
-
-              <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-center">
-                <button
-                  className="block rounded-lg bg-indigo-600 px-3 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
-                  type="button"
-                >
-                  New travel plan +
-                </button>
               </div>
             </div>
           </div>
         </header>
-        <div className="px-8 mb-5 rounded-md text-gray-400 h-auto text-wrap">
-          {formData.prompt}
-        </div>
 
-        <div className="container mx-auto px-8 pt-0 pb-20">
+        {loading && (
+          <div className="loading-container w-full bg-slate-800">
+            <div>
+              <div className="loader"></div>
+              <p className="loading-text"></p>
+            </div>
+          </div>
+        )}
+        <div className="container mx-auto px-8">
           {/* <h2 className="text-2xl font-bold mb-4">Note:</h2>
           <p>{responseData.note}</p> */}
 
           {responseData.places && (
-            <div className="mt-8">
+            <div className="mt-0">
               <h2 className="text-2xl font-bold mb-4">Places</h2>
               <ul>
                 {responseData.places.map((place, index) => (
@@ -103,7 +133,8 @@ export default function Home() {
                   //   </p>
                   //   <p>Address: {place.address}</p>
                   // </li>
-                  <a key={index}
+                  <a
+                    key={index}
                     href="#"
                     className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:p-8"
                   >
@@ -172,12 +203,13 @@ export default function Home() {
                   //   <p>Address: {item.address}</p>
                   // </li>
 
-                  <article key={index} className="col-span-6 mt-2 rounded-xl border-l border-gray-300 bg-gray-100 text-black p-4">
+                  <article
+                    key={index}
+                    className="col-span-6 mt-2 rounded-xl border-l border-gray-300 bg-gray-100 text-black p-4"
+                  >
                     <div className="flex items-center gap-4">
                       <div>
-                        <h3 className="text-lg font-medium">
-                          {item.name}
-                        </h3>
+                        <h3 className="text-lg font-medium">{item.name}</h3>
 
                         {/* <div className="flow-root">
                           <ul className="-m-1 flex flex-wrap">
@@ -253,40 +285,66 @@ export default function Home() {
 
           {responseData.hotels && (
             <div className="mt-8">
-              <h2 className="text-2xl font-bold mb-4">Hotels:</h2>
+              <h2 className="text-2xl font-bold mb-4">Hotels</h2>
               <ul>
                 {responseData.hotels.map((hotel, index) => (
-                  <li key={index} className="mb-4">
-                    <h3 className="text-xl font-semibold">{hotel.name}</h3>
-                    <p>Address: {hotel.address}</p>
-                    <p>Cost: {hotel.cost}</p>
-                    <p>Review: {hotel.review}</p>
-                  </li>
+                  // <li key={index} className="mb-4">
+                  //   <h3 className="text-xl font-semibold">{hotel.name}</h3>
+                  //   <p>Address: {hotel.address}</p>
+                  //   <p>Cost: {hotel.cost}</p>
+                  //   <p>Review: {hotel.review}</p>
+                  // </li>
+                  <article
+                    key={index}
+                    className="mt-4 hover:animate-background rounded-xl bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 p-0.5 shadow-xl transition hover:bg-[length:400%_400%] hover:shadow-sm hover:[animation-duration:_4s]"
+                  >
+                    <div className="rounded-[10px] bg-white p-4 !pt-10 sm:p-6">
+                      <h1 className="m-0 border-indigo-600 border-l px-2 font-bold">
+                        {hotel.cost}
+                      </h1>
+
+                      <a href="#">
+                        <h3 className="mt-2.5 text-xl font-medium text-gray-900">
+                          {hotel.name}
+                        </h3>
+                      </a>
+
+                      <div className="mt-4 flex flex-wrap gap-1">
+                        <span className="whitespace-nowrap rounded-full bg-purple-100 px-2.5 py-0.5 text-xs text-purple-600">
+                          {hotel.address}
+                        </span>
+
+                        <span className="mt-1 whitespace-nowrap rounded-full bg-purple-100 px-2.5 py-0.5 text-xs text-purple-600">
+                          {hotel.review}
+                        </span>
+                      </div>
+                    </div>
+                  </article>
                 ))}
               </ul>
             </div>
           )}
         </div>
 
-        <div className="fixed bottom-0 w-full bg-white border-t border-gray-300">
+        <div className="fixed top-0 w-full bg-white border-t border-gray-300">
           <form onSubmit={handleSubmit} className="mx-0 py-4 px-4">
-            <div className="grid grid-cols-12 gap-3">
-              <div className="col-span-6">
+            <div className="grid grid-cols-12 gap-4">
+              <div className="col-span-8">
                 <input
                   type="text"
                   name="prompt"
                   value={formData.prompt}
                   onChange={handleInputChange}
                   placeholder="Type something..."
-                  className="col-span-1 w-full py-2 px-4 bg-white border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="border-0 border-b col-span-1 w-full py-3 px-4 bg-white border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:border-transparent"
                 />
               </div>
-              <div className="col-span-6">
+              <div className="col-span-2">
                 <button
-                  className="border rounded-md px-4 py-2 bg-indigo-600 text-sm font-medium transition hover:bg-indigo-700 focus:outline-none focus:ring text-white"
+                  className="border rounded-md px-4 py-3 bg-indigo-600 text-sm font-medium transition hover:bg-indigo-700 focus:outline-none focus:ring text-white"
                   type="submit"
                 >
-                  send
+                  Enter
                 </button>
               </div>
             </div>

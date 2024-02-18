@@ -52,6 +52,28 @@ const Register = () => {
     }
   };
 
+  const calculateAgeGroup = (dob) => {
+    // Calculate age from DOB
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const month = today.getMonth() - birthDate.getMonth();
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    // Determine age group based on age
+    if (age <= 12) {
+      return "Teen";
+    } else if (age <= 18) {
+      return "Youth";
+    } else if (age <= 60) {
+      return "Adult";
+    } else {
+      return "Senior";
+    }
+  };
+
   return (
     <>
       <section className="bg-white">
