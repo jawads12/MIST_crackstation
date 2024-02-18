@@ -3,9 +3,6 @@ const bcrypt = require("bcrypt");
 const db = require("./db");
 const app = express();
 const User = require("./model/userModel");
-const Admin=require("./model/adminModel");
-const Review = require("./model/reviewModel");
-const News = require("./model/newsModel");
 const cors = require('cors');
 
 app.use(express.json());
@@ -145,5 +142,3 @@ app.get("/api/reviews/:email", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
-
