@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const db = require("./db");
 const app = express();
 const User = require("./model/userModel");
+const Admin=require("./model/adminModel");
+const Review = require("./model/reviewModel");
 const cors = require('cors');
 
 app.use(express.json());
@@ -156,6 +158,52 @@ app.post("/api/adminlogin", async (req, res) => {
   } catch (error) {
     // If an error occurs, send an error response
     console.error("Error during login:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
+// POST endpoint to submit a review
+app.post("/api/reviews", async (req, res) => {
+  try {
+    // Extract review data from the request body
+    const { email, date, comment } = req.body;
+
+    // Create a new review using the Review model
+    const newReview = new Review({
+      email: email,
+      date: date,
+      comment: comment,
+    });
+
+    // Save the new review to the database
+    await newReview.save();
+
+    // Send the saved review object as the response
+    res.status(201).json(newReview);
+  } catch (error) {
+    // If an error occurs, send an error response
+    console.error("Error submitting review:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+// GET endpoint to fetch reviews by email, sorted by date
+app.get("/api/reviews/:email", async (req, res) => {
+  try {
+    // Extract email from the request parameters
+    const { email } = req.params;
+
+    // Find and sort reviews by date in descending order ('-date')
+    const reviews = await Review.find({ email: email }).sort('-date');
+
+    // Send the fetched reviews as the response
+    res.status(200).json(reviews);
+  } catch (error) {
+    // If an error occurs, send an error response
+    console.error("Error fetching reviews:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
