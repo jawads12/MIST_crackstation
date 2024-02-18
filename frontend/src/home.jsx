@@ -10,12 +10,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const userInfoString = `Age group is Young, gender is Male.`;
 
-  const [reviewData, setreviewData] = useState({
-    email: "",
-    date: "",
-    comment: "",
-
-  });
 
   const [formData, setFormData] = useState({
     prompt: "",
@@ -65,15 +59,7 @@ export default function Home() {
       try {
         setResponseData(JSON.parse(jsonString));
         console.log(JSON.parse(jsonString));
-        // Check if the note is 'review' and then submit the review
-        if (JSON.parse(jsonString).note === "review") {
-          // Assuming the review data is structured appropriately
-          submitReview({
-            email: userName, // or however you obtain the user's email
-            date: new Date().toISOString(),
-            comment: formData.prompt,
-          });
-        }
+        
       } catch (error) {
         console.error("Error parsing JSON:", error);
         return;
